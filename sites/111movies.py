@@ -31,14 +31,15 @@ default_domain = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(base_url))
 headers = {
     "Referer": default_domain,
     "User-Agent": user_agent,
-    "Content-Type": "application/gzip"
+    "Content-Type": "application/x-shockwave-flash",
+    "X-Csrf-Token": "lOky1FfH4K8k7nlP1rymCoe3q2smDW8T",
 }
 
 # Utility Functions
 ''' Encodes input using Base64 with custom character mapping. '''
 def custom_encode(input):
     src = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
-    dst = "Ckbl5ym-WLAev9dTuhpgK8PHtSGa2EBDnjMZR_Y0Xx7co1qrfFNJOQ6iUs4zIVw3"
+    dst = "zF-NXZYgxKqj7nbuGoI_SDfkQ9y3VcJrRBip6tadPwv0MWLehT5Um4As2l8C1HEO"
     trans = str.maketrans(src, dst)
     b64 = base64.b64encode(input.encode()).decode().replace('+', '-').replace('/', '_').replace('=', '')
     return b64.translate(trans)
@@ -54,8 +55,8 @@ raw_data = match.group(1)
 
 
 # AES encryption setup
-key_hex = "ecc34a66edea3dcd48c8733812365f5caf7d28865993ae5fdc4a08436736a998"
-iv_hex = "4b47db0a764158dff36db37d27fdfcea"
+key_hex = "55eb57c5e52d3ae19f899e702cb539084adf606b06cc44382c21e48a82215d8a"
+iv_hex = "324d1fae84bafaba643f236ee116de27"
 aes_key = bytes.fromhex(key_hex)
 aes_iv = bytes.fromhex(iv_hex)
 
@@ -64,21 +65,21 @@ padded_data = pad(raw_data.encode(), AES.block_size)
 aes_encrypted = cipher.encrypt(padded_data).hex()
 
 # XOR operation
-xor_key = bytes.fromhex("fafd3f")
+xor_key = bytes.fromhex("dd69ce")
 xor_result = ''.join(chr(ord(char) ^ xor_key[i % len(xor_key)]) for i, char in enumerate(aes_encrypted))
 
 # Custom encoded string
 encoded_final = custom_encode(xor_result)
 
 # Make final request
-static_path = "APA91z6a9CYF3L6StzwNlIs5j2LKG0HDcvCgRGTeS9nNSWT_z-mUqshnN852FBiC-v6OgWXJhgDNpCJqsMjQHtnrkk-9OesJ9cTkKseogBTlaFObhfNNBTPT4VZ0TVqTLKH-9t5e_fkch2ehWDh25--V7sR874GNGLCqjrWRpCD0RoAb4EwquyU"
+static_path = "9816ad6837c78fcc2e0944fe2e6398b8a525d43f1afea28f9d5347b35cd53128/c1a5e2db/APA91iMgb2ifswAU727_OpyUBk45sDi2ciUVYVGZXVUXlYUrIshxfIIWC7WwfK3Rug52O7fWefpKiXKVeVPB-I4gl5GeF6Wj-MeAmJpzWiKkZMhg5kDvEv0fRguit6YtNIAHOpF47joyVLBgqzKlw98WhN6eQiF_QvG8Mmq3j2tpbtfSw0oAU-o/2db11c71f014bd4128f1a3ec314796da7e09b87e/tor/c6779436-9455-57ed-8527-73ad249a83db"
 api_servers = f"https://111movies.net/{static_path}/{encoded_final}/sr"
-response = requests.get(api_servers, headers=headers).json()
+response = requests.post(api_servers, headers=headers).json()
 
 # Select a random server
-server = random.choice(response)['data']
+server = response[0].get('data')
 api_stream = f"https://111movies.net/{static_path}/{server}"
-response = requests.get(api_stream, headers=headers)
+response = requests.post(api_stream, headers=headers)
 
 # Extract video URL
 video_url = response.json()['url']
