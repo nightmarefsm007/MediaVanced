@@ -4,11 +4,14 @@ import json
 import requests
 from urllib.parse import urlparse
 
+# Provider: AnimeDekho
+
 '''
 Supports:
 https://x.pixfusion.in/
 https://lecteurvideo.com/
 https://lecteur6.com/
+https://as-cdn21.top/
 '''
 
 class Colors:
@@ -24,7 +27,7 @@ class Colors:
 
 
 # Constants
-base_url = 'https://lecteur6.com/video/d71dd235287466052f1630f31bde7932'
+base_url = 'https://as-cdn21.top/video/956f9d4b926a8af07bf32de21edd8eee'
 user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
 default_domain = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(base_url))
 headers = {
