@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
 
-
 '''
 Supports:
 https://allmovieland.you/
@@ -53,7 +52,7 @@ iframe_html = requests.get(iframe_page_url, headers=iframe_headers).text
 # Extract file API endpoint used to retrieve playlist data
 file_match = re.search(r'"file":"([^"]+)"', iframe_html)
 if not file_match:
-    sys.exit("Streaming file endpoint not found")
+    exit("Streaming file endpoint not found")
 
 playlist_api_url = file_match.group(1).replace('\\/', '/')
 

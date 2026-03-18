@@ -30,8 +30,9 @@ class Colors:
 
 
 # Constants
-base_url = "https://player.vidplus.to/embed/movie/799882?autoplay=true&download=true"
+base_url = "https://player.vidplus.pro/embed/movie/687163?autoplay=true&download=true"
 user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36"
+server = 3
 default_domain = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(base_url))
 headers = {
     "Accept": "*/*",
@@ -40,28 +41,30 @@ headers = {
     "X-Requested-With": "XMLHttpRequest"
 }
 
-# Get server and ID
-item_id = re.search(r'\/(?:movie|webseries)\/(\d+)', base_url).group(1)
-server = 4 # Default server
+# TMDB API Key (VidRock)
+''' ⚠️ Warning: Unauthorized use of another person’s API key is prohibited. The provided key is intended strictly for testing purposes. We strongly recommend generating and using your own API key in production.'''
+api_key = base64.b64decode("NTRlMDA0NjZhMDk2NzZkZjU3YmE1MWM0Y2EzMGIxYTY=").decode('utf-8')
 
-# Get Movie/Webseries info
-data = {
-    "id": item_id,
-    "key": "cGxheWVyLnZpZHNyYy5jb19zZWNyZXRLZXk="
-}
-encoded = base64.b64encode(json.dumps(data).encode()).decode()
-api_url = f'{default_domain}/api/tmdb?params=cbc7.{encoded}.9lu'
-response = requests.get(api_url, headers=headers).json()
+# Get content info
+match = re.search(r'\/embed\/(.*?)\/(\d+)(?:\/(\d+)\/(\d+))?', base_url)
+if match:
+    content_type = match.group(1)
+    content_id, season, episode = (
+        match.group(2),
+        match.group(3) or None,
+        match.group(4) or None
+    )
 
 # Get required data
-metadata = response.get('data')
-imdb_id = metadata.get('imdb_id')
-title = metadata.get('title')
-release_year = metadata.get('release_date').split('-')[0]
+response = requests.get(f"https://api.themoviedb.org/3/{content_type}/{content_id}?api_key={api_key}&append_to_response=external_ids").json()
+imdb_id = response.get('imdb_id') or (response.get('external_ids') or {}).get('imdb_id')
+title = response.get('title')
+release_year = response.get('release_date').split('-')[0]
 
 # Build request parameters and fetch encrypted response
 request_args = '*'.join([title, release_year, imdb_id])
-response = requests.get(f'{default_domain}/api/server?id={item_id}&sr={server}&args={request_args}', headers=headers).json()
+response = requests.get(f'{default_domain}/api/server?id={content_id}&sr={server}&args={request_args}', headers=headers).json()
+print(response)
 
 # Decode the base64-encoded JSON container
 encoded_payload = response.get('data')

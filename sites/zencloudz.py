@@ -51,8 +51,12 @@ def derive_aes_key(key_fragment, secondary_key, dynamic_key, sbox):
 
     return aes_key
 
+# Use a global session(terminates token issues)
+session = requests.Session()
+session.headers.update(headers)
+
 # Fetch page content
-response = requests.get(base_url, headers=headers).text
+response = session.get(base_url).text
 
 # Get site data
 match = re.search(r'data:\s*\[null,null,(\{.*?\})\],\s*form:\snull', response)
@@ -98,7 +102,7 @@ crypto_info = {
 }
 
 # Fetch encrypted video data
-token_response = requests.get(f'{default_domain}/api/m3u8/{token_reference}').json()
+token_response = session.get(f'{default_domain}/api/m3u8/{token_reference}').json()
 encrypted_video_b64 = token_response.get('video_b64')
 dynamic_key_b64 = token_response.get('key_frag')
 
