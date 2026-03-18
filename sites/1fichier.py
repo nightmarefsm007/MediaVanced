@@ -1,10 +1,8 @@
+import re
 import requests
 from bs4 import BeautifulSoup
-import re
-import urllib3
 
-# Disable SSL warnings
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Provider: Bolly4U
 
 '''
 Supports:
@@ -26,15 +24,13 @@ class Colors:
 
 
 # Constants
-base_url = "https://1fichier.com/?8j23awpf2mp93xq04bui&af=62851"
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+base_url = "https://1fichier.com/?p7ix9lf97rshtdr9anmq"
+user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36"
 af_value = re.search(r"af=(\d+)", base_url).group(1) if "af=" in base_url else "0"
-
 headers = {
     "Referer": "https://1fichier.com",
     "User-Agent": user_agent
 }
-
 cookies = {
     "AF": af_value
 }
@@ -44,27 +40,27 @@ session = requests.Session()
 session.headers.update(headers)
 session.cookies.update(cookies)
 
-
 # Fetch response
-response = session.get(base_url, verify=False).text
+response = session.get(base_url).text
 soup = BeautifulSoup(response, "html.parser")
 
-# Extract and POST data
+# Prepare POST payload
 adz = soup.find("input", attrs = {"name":"adz"})['value']
 payload = {
     "adz" : adz
 }
-response = session.post(base_url, data=payload, verify=False).text
 
-# Extract video url
+# Get download page
+response = session.post(base_url, data=payload).text
 soup = BeautifulSoup(response, "html.parser")
-video_link = soup.find("a", attrs={"class": "ok btn-general btn-orange"})
 
-if video_link is None:
-    print(f"{Colors.warning}The site has detected security issues. Please try again with a different IP or use a proxy. Exiting...{Colors.endc}")
-    exit(1)
+# Extract download URL
+download_href = soup.find("a", attrs={"class": "ok btn-general btn-orange"})
+if download_href is None:
+    exit(f"{Colors.warning}Access blocked due to security detection. Try a different IP or use a proxy. Exiting...{Colors.endc}")
 
-video_url = video_link['href']
+# Get video URL
+video_url = download_href.get('href')
 
 # Print results
 print("\n" + "#" * 25 + "\n" + "#" * 25)
