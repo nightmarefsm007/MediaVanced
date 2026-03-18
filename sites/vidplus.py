@@ -64,7 +64,6 @@ release_year = response.get('release_date').split('-')[0]
 # Build request parameters and fetch encrypted response
 request_args = '*'.join([title, release_year, imdb_id])
 response = requests.get(f'{default_domain}/api/server?id={content_id}&sr={server}&args={request_args}', headers=headers).json()
-print(response)
 
 # Decode the base64-encoded JSON container
 encoded_payload = response.get('data')
