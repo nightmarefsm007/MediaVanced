@@ -26,7 +26,7 @@ class Colors:
 
 
 # Constants
-base_url = 'https://animex.one/watch/your-name-21519-episode-1'
+base_url = 'https://animex.one/watch/my-hero-academia-vigilantes-season-2-195322-episode-1'
 user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
 aes_key_hex = "0153a09e3ac652d285f7ca21505ee3b3a2820965136fb4dc9c9190069641190e"
 primary_key_hex = "a6d74d826a2effed042741d60611657165fcfdf0cccaea1345842d4c520f11cd0ebe2a4374d849f34fab2904e99e472d03e3310882a746b3d3a99815ffe60764"
@@ -63,6 +63,10 @@ def xor_diffuse_bytes(input_bytes: bytes, key1: bytes, key2: bytes, lookup_table
 
 ''' Swap nibbles and XOR each byte with a position-based mask. '''
 def swap_nibbles_and_mask(input_bytes: bytes) -> bytes:
+    """
+    Scrambles a byte array by swapping high and low nibbles of each byte
+    and XORing with a position-dependent mask.
+    """
     output = bytearray(len(input_bytes))
     for index, byte in enumerate(input_bytes):
         mask = (index * 23) & 0xFF
@@ -70,20 +74,20 @@ def swap_nibbles_and_mask(input_bytes: bytes) -> bytes:
     return bytes(output)
 
 # Get content info
-content_info = re.search(r'\/.*?(\d+)-episode-(\d+)', base_url)
+content_info = re.search(r'watch\/(.*episode-(\d+))', base_url)
 media_id = content_info.group(1)
 episode_num = content_info.group(2)
 
-# Prepare payload for encryption
+# Prepare payload
 payload = {
-    "id": int(media_id),
+    "id": media_id,
     "host": "pahe",
     "epNum": episode_num,
     "type": "sub",
-    "cache": "true",
     "timestamp": int(time.time() * 1000)
 }
-plaintext = json.dumps(payload)
+#plaintext = json.dumps(payload)
+plaintext = """{"id":"my-hero-academia-vigilantes-season-2-juxa3","host":"pahe","epNum":"1","type":"sub","timestamp":1773890915091}"""
 
 # Scramble plaintext bytes with nibble swap and mask
 payload_bytes = plaintext.encode("utf-8")
