@@ -63,10 +63,6 @@ def xor_diffuse_bytes(input_bytes: bytes, key1: bytes, key2: bytes, lookup_table
 
 ''' Swap nibbles and XOR each byte with a position-based mask. '''
 def swap_nibbles_and_mask(input_bytes: bytes) -> bytes:
-    """
-    Scrambles a byte array by swapping high and low nibbles of each byte
-    and XORing with a position-dependent mask.
-    """
     output = bytearray(len(input_bytes))
     for index, byte in enumerate(input_bytes):
         mask = (index * 23) & 0xFF
@@ -78,16 +74,22 @@ content_info = re.search(r'watch\/(.*episode-(\d+))', base_url)
 media_id = content_info.group(1)
 episode_num = content_info.group(2)
 
-# Prepare payload
+# Fetch page content and extract slug
+response = requests.get(base_url, headers=headers).text
+match = re.search(r'slug:\"(.*?)\"', response)
+if not match:
+    exit("Error: Unable to extract slug from the page")
+slug = match.group(1)
+
+# Prepare payload for encryption
 payload = {
-    "id": media_id,
+    "id": slug,
     "host": "pahe",
     "epNum": episode_num,
     "type": "sub",
     "timestamp": int(time.time() * 1000)
 }
-#plaintext = json.dumps(payload)
-plaintext = """{"id":"my-hero-academia-vigilantes-season-2-juxa3","host":"pahe","epNum":"1","type":"sub","timestamp":1773890915091}"""
+plaintext = json.dumps(payload)
 
 # Scramble plaintext bytes with nibble swap and mask
 payload_bytes = plaintext.encode("utf-8")
