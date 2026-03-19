@@ -4,7 +4,7 @@ import json
 import requests
 from urllib.parse import urlparse
 
-# Provider: AnimeDekho
+# Provider: AnimeDekho, MovieRulz
 
 '''
 Supports:
@@ -12,6 +12,7 @@ https://x.pixfusion.in/
 https://lecteurvideo.com/
 https://lecteur6.com/
 https://as-cdn21.top/
+https://streamvin.com/
 '''
 
 class Colors:
