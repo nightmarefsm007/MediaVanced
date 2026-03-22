@@ -82,7 +82,7 @@ salt = get_random_bytes(16)
 iv = get_random_bytes(12)
 aes_key = get_random_bytes(32)
 
-# Generate fingerprint
+# Spoof browser fingerprint
 fingerprint = {
     'tz': "Asia/Calcutta",
     'lang': "en-GB",
@@ -119,7 +119,7 @@ xored = bytearray(len(plaintext))
 for i in range(len(plaintext)):
     xored[i] = plaintext[i] ^ aes_key[i % len(aes_key)]
 
-# Encrypt Payload using AES-256-GCM
+# Encrypt XOR'd Payload using AES-256-GCM
 cipher = AES.new(aes_key, AES.MODE_GCM, nonce=iv)
 encrypted, tag = cipher.encrypt_and_digest(xored)
 aes_ciphertext = encrypted + tag
