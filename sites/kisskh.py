@@ -77,10 +77,7 @@ encrypted = cipher.encrypt(padded_data)
 token = encrypted.hex().upper()
 
 # Request the streaming data from the server using the generated token
-response = requests.get(
-    f'https://kisskh.ws/api/DramaList/Episode/{episode_id}.png?err=false&ts=null&time=null&kkey={token}',
-    headers=headers
-).json()
+response = requests.get(f'https://kisskh.ws/api/DramaList/Episode/{episode_id}.png?err=false&ts=null&time=null&kkey={token}', headers=headers).json()
 
 # Extract the video URL from the API response
 video_url = response.get('Video')
