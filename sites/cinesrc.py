@@ -34,7 +34,7 @@ headers = {
     'Referer': default_domain,
     'User-Agent': user_agent
 }
-server_action_token = requests.get('https://script.google.com/macros/s/AKfycbz0Nk6EXmwLr-QxTan0EZ1AUKTFG4bxb-9p0BYURnUmyMbQuI-ZF3ybwa8cGg8UXn4w/exec').json().get('key')
+next_action_tokens = requests.get('https://script.google.com/macros/s/AKfycbw_Q_5IHAiAmEABUh0QiqDUGzrHtTwkmbZcWhXM3ixH4IiukUK5wfDTQ5Sjj6EPwbRd/exec').json().get('tokens')
 rsa_public_key = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFplzWaLwhwOrmKuhe6Vghq4RU
 NBjis9AUEl9Vw6r3CHz8aQGncnNgQ0t1oChO7I7EVs2oKcOrBNfhg+8aP4gURUoU
@@ -82,7 +82,7 @@ salt = get_random_bytes(16)
 iv = get_random_bytes(12)
 aes_key = get_random_bytes(32)
 
-# Spoof browser fingerprint
+# Generate fingerprint
 fingerprint = {
     'tz': "Asia/Calcutta",
     'lang': "en-GB",
@@ -119,7 +119,7 @@ xored = bytearray(len(plaintext))
 for i in range(len(plaintext)):
     xored[i] = plaintext[i] ^ aes_key[i % len(aes_key)]
 
-# Encrypt XOR'd Payload using AES-256-GCM
+# Encrypt Payload using AES-256-GCM
 cipher = AES.new(aes_key, AES.MODE_GCM, nonce=iv)
 encrypted, tag = cipher.encrypt_and_digest(xored)
 aes_ciphertext = encrypted + tag
@@ -139,7 +139,10 @@ encrypted_blob = '~'.join(['v1.1', encrypted_key_b64, iv_b64, ciphertext_b64])
 
 # Prepare Payload and Get Encrypted Streaming Data
 request_payload = [content_id, content_type, season, episode, encrypted_blob, selected_server]
-response = requests.post(base_url, data=json.dumps(request_payload), headers={**headers, 'Accept': 'text/x-component', 'next-action': server_action_token, 'Content-Type': 'text/plain;charset=UTF-8'}).text
+for action_token in next_action_tokens:
+    response = requests.post(base_url, data=json.dumps(request_payload), headers={**headers, 'Accept': 'text/x-component', 'next-action': action_token, 'Content-Type': 'text/plain;charset=UTF-8'}).text
+    if 'Server action' not in response:
+        break
 
 # Extract encrypted payload line
 encrypted_line = response.splitlines()[1]
