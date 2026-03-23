@@ -26,6 +26,7 @@ class Colors:
 base_url = 'https://kisskh.ws/Drama/Pursuit-of-Jade---Chasing-Jade/Episode-1?id=10104&ep=207278&page=0&pageSize=100'
 user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
 default_domain = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(base_url))
+subs_token = 'VgV52sWhwvBSf8BsM3BRY9weWiiCbtGp' # Use this token for subtitles
 vid_token = '62f176f3bb1b5b8e70e39932ad34a0c7'
 headers = {
     'Referer': default_domain,
